@@ -39,6 +39,14 @@ import imgaug  # https://github.com/aleju/imgaug (pip3 install imgaug)
 # I submitted a pull request https://github.com/cocodataset/cocoapi/pull/50
 # If the PR is merged then use the original repo.
 # Note: Edit PythonAPI/Makefile and replace "python" with "python3".
+ROOT_DIR = os.path.abspath("/usr/local/lib/isaac/apps/carter_sim_struct2depth/struct2depth/Mask_RCNN/samples/coco/coco/PythonAPI")
+
+# Import Mask RCNN
+sys.path.append(ROOT_DIR)  # To find local version of the library
+# from struct2depth.Mask_RCNN.samples.coco.coco.PythonAPI.pycocotools.coco import COCO
+# from struct2depth.Mask_RCNN.samples.coco.coco.PythonAPI.pycocotools.cocoeval import COCOeval
+# from struct2depth.Mask_RCNN.samples.coco.coco.PythonAPI.pycocotools import mask as maskUtils
+
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from pycocotools import mask as maskUtils
@@ -48,7 +56,7 @@ import urllib.request
 import shutil
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath("../../")
+ROOT_DIR = os.path.abspath("/usr/local/lib/isaac/apps/carter_sim_struct2depth/struct2depth/Mask_RCNN")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library

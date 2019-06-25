@@ -331,7 +331,7 @@ class Dataset(object):
         """Takes a source class ID and returns the int class ID assigned to it.
 
         For example:
-        dataset.map_source_class_id("coco.12") -> 23
+        dataset.map_source_class_id("coco_package.12") -> 23
         """
         return self.class_from_source_map[source_class_id]
 
