@@ -12,19 +12,19 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
        the command line as such:
 
     # Train a new model starting from pre-trained COCO weights
-    python3 coco.py train --dataset=/path/to/coco/ --model=coco
+    python3 cocoAPI.py train --dataset=/path/to/cocoAPI/ --model=cocoAPI
 
     # Train a new model starting from ImageNet weights. Also auto download COCO dataset
-    python3 coco.py train --dataset=/path/to/coco/ --model=imagenet --download=True
+    python3 cocoAPI.py train --dataset=/path/to/cocoAPI/ --model=imagenet --download=True
 
     # Continue training a model that you had trained earlier
-    python3 coco.py train --dataset=/path/to/coco/ --model=/path/to/weights.h5
+    python3 cocoAPI.py train --dataset=/path/to/cocoAPI/ --model=/path/to/weights.h5
 
     # Continue training the last model you trained
-    python3 coco.py train --dataset=/path/to/coco/ --model=last
+    python3 cocoAPI.py train --dataset=/path/to/cocoAPI/ --model=last
 
     # Run COCO evaluatoin on the last model you trained
-    python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
+    python3 cocoAPI.py evaluate --dataset=/path/to/cocoAPI/ --model=last
 """
 
 import os
@@ -39,13 +39,13 @@ import imgaug  # https://github.com/aleju/imgaug (pip3 install imgaug)
 # I submitted a pull request https://github.com/cocodataset/cocoapi/pull/50
 # If the PR is merged then use the original repo.
 # Note: Edit PythonAPI/Makefile and replace "python" with "python3".
-ROOT_DIR = os.path.abspath("/usr/local/lib/isaac/apps/carter_sim_struct2depth/struct2depth/Mask_RCNN/samples/coco/coco/PythonAPI")
+ROOT_DIR = os.path.abspath("/usr/local/lib/isaac/apps/carter_sim_struct2depth/struct2depth/Mask_RCNN/samples/cocoAPI/cocoAPI/PythonAPI")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
-# from struct2depth.Mask_RCNN.samples.coco.coco.PythonAPI.pycocotools.coco import COCO
-# from struct2depth.Mask_RCNN.samples.coco.coco.PythonAPI.pycocotools.cocoeval import COCOeval
-# from struct2depth.Mask_RCNN.samples.coco.coco.PythonAPI.pycocotools import mask as maskUtils
+# from struct2depth.Mask_RCNN.samples.cocoAPI.cocoAPI.PythonAPI.pycocotools.cocoAPI import COCO
+# from struct2depth.Mask_RCNN.samples.cocoAPI.cocoAPI.PythonAPI.pycocotools.cocoeval import COCOeval
+# from struct2depth.Mask_RCNN.samples.cocoAPI.cocoAPI.PythonAPI.pycocotools import mask as maskUtils
 
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
@@ -82,7 +82,7 @@ class CocoConfig(Config):
     to the COCO dataset.
     """
     # Give the configuration a recognizable name
-    NAME = "coco"
+    NAME = "cocoAPI"
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
@@ -139,12 +139,12 @@ class CocoDataset(utils.Dataset):
 
         # Add classes
         for i in class_ids:
-            self.add_class("coco", i, coco.loadCats(i)[0]["name"])
+            self.add_class("cocoAPI", i, coco.loadCats(i)[0]["name"])
 
         # Add images
         for i in image_ids:
             self.add_image(
-                "coco", image_id=i,
+                "cocoAPI", image_id=i,
                 path=os.path.join(image_dir, coco.imgs[i]['file_name']),
                 width=coco.imgs[i]["width"],
                 height=coco.imgs[i]["height"],
@@ -239,7 +239,7 @@ class CocoDataset(utils.Dataset):
         """
         # If not a COCO image, delegate to parent class.
         image_info = self.image_info[image_id]
-        if image_info["source"] != "coco":
+        if image_info["source"] != "cocoAPI":
             return super(CocoDataset, self).load_mask(image_id)
 
         instance_masks = []
@@ -249,7 +249,7 @@ class CocoDataset(utils.Dataset):
         # of class IDs that correspond to each channel of the mask.
         for annotation in annotations:
             class_id = self.map_source_class_id(
-                "coco.{}".format(annotation['category_id']))
+                "cocoAPI.{}".format(annotation['category_id']))
             if class_id:
                 m = self.annToMask(annotation, image_info["height"],
                                    image_info["width"])
@@ -280,7 +280,7 @@ class CocoDataset(utils.Dataset):
     def image_reference(self, image_id):
         """Return a link to the image in the COCO Website."""
         info = self.image_info[image_id]
-        if info["source"] == "coco":
+        if info["source"] == "cocoAPI":
             return "http://cocodataset.org/#explore?id={}".format(info["id"])
         else:
             super(CocoDataset, self).image_reference(image_id)
@@ -338,7 +338,7 @@ def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
 
             result = {
                 "image_id": image_id,
-                "category_id": dataset.get_source_class_id(class_id, "coco"),
+                "category_id": dataset.get_source_class_id(class_id, "cocoAPI"),
                 "bbox": [bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]],
                 "score": score,
                 "segmentation": maskUtils.encode(np.asfortranarray(mask))
@@ -414,7 +414,7 @@ if __name__ == '__main__':
                         metavar="<command>",
                         help="'train' or 'evaluate' on MS COCO")
     parser.add_argument('--dataset', required=True,
-                        metavar="/path/to/coco/",
+                        metavar="/path/to/cocoAPI/",
                         help='Directory of the MS-COCO dataset')
     parser.add_argument('--year', required=False,
                         default=DEFAULT_DATASET_YEAR,
@@ -422,7 +422,7 @@ if __name__ == '__main__':
                         help='Year of the MS-COCO dataset (2014 or 2017) (default=2014)')
     parser.add_argument('--model', required=True,
                         metavar="/path/to/weights.h5",
-                        help="Path to weights .h5 file or 'coco'")
+                        help="Path to weights .h5 file or 'cocoAPI'")
     parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
@@ -466,7 +466,7 @@ if __name__ == '__main__':
                                   model_dir=args.logs)
 
     # Select weights file to load
-    if args.model.lower() == "coco":
+    if args.model.lower() == "cocoAPI":
         model_path = COCO_MODEL_PATH
     elif args.model.lower() == "last":
         # Find last trained weights
