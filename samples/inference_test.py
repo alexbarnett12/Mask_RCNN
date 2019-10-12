@@ -6,6 +6,7 @@ import numpy as np
 import skimage.io
 import matplotlib
 import matplotlib.pyplot as plt
+import cv2
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -86,15 +87,38 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors',
                'teddy bear', 'hair drier', 'toothbrush']
 
+cap = cv2.VideoCapture(0)
+
+while(True):
+    # Capture frame-by-frame
+    ret, img = cap.read()
+
+    # result = model.detect([img], verbose=1)
+
+    # Visualize results
+    # r = result[0]
+    #
+    # visualize.display_instances(img, r['rois'], r['masks'], r['class_ids'],
+    #                             class_names, r['scores'])
+    # Display the resulting frame
+    cv2.imshow('frame', img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# When everything done, release the capture
+cap.release()
+cv2.destroyAllWindows()
+
+
 
 # Load a random image from the images folder
-file_names = next(os.walk(IMAGE_DIR))[2]
-image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
+# file_names = next(os.walk(IMAGE_DIR))[2]
+# image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
 
 # Run detection
-results = model.detect([image], verbose=1)
+# results = model.detect([image], verbose=1)
 
 # Visualize results
-r = results[0]
-visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
-                            class_names, r['scores'])
+# r = results[0]
+# visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
+#                            class_names, r['scores'])
